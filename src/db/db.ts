@@ -60,10 +60,26 @@ async function doInit(): Promise<SQLiteDBConnection> {
 
   await conn.open()
   await conn.execute(schemaSql)
+  await runMigrations(conn)
   if (isWeb) await sqlite.saveToStore(DB_NAME)
 
   db = conn
   return conn
+}
+
+/**
+ * Additive schema changes made after the first release. schema.sql only
+ * creates tables that don't exist, so columns added later must be applied
+ * here, guarded so they run once per device.
+ */
+async function runMigrations(conn: SQLiteDBConnection): Promise<void> {
+  await addColumnIfMissing(conn, 'expenses', 'recurring_of', 'TEXT REFERENCES expenses(id)')
+}
+
+async function addColumnIfMissing(conn: SQLiteDBConnection, table: string, column: string, type: string) {
+  const info = await conn.query(`PRAGMA table_info(${table})`)
+  const exists = (info.values ?? []).some((c: { name: string }) => c.name === column)
+  if (!exists) await conn.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`, false)
 }
 
 function requireDb(): SQLiteDBConnection {

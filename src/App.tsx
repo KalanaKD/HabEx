@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { IconType } from 'react-icons'
 import { LuChartPie, LuCircleCheck, LuSun, LuWallet } from 'react-icons/lu'
+import ExpenseList from './features/expenses/ExpenseList'
 import HabitList from './features/habits/HabitList'
 
 type Tab = 'today' | 'habits' | 'expenses' | 'budgets'
@@ -29,7 +30,7 @@ function App() {
       <main className="mx-auto w-full max-w-md flex-1 p-4 pb-24">
         {tab === 'today' && <Placeholder name="Today screen" step={8} />}
         {tab === 'habits' && <HabitList />}
-        {tab === 'expenses' && <Placeholder name="Expense tracker" step={5} />}
+        {tab === 'expenses' && <ExpenseList />}
         {tab === 'budgets' && <Placeholder name="Budgets" step={6} />}
       </main>
 

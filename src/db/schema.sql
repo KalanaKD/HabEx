@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS expenses (
   spent_on TEXT NOT NULL,
   note TEXT,
   is_recurring INTEGER DEFAULT 0
+  -- recurring_of TEXT: added by migration in db.ts. Points at the template
+  -- expense this row was auto-generated from (NULL for templates/one-offs).
 );
 
 CREATE TABLE IF NOT EXISTS budgets (

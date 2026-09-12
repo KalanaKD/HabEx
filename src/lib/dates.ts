@@ -47,3 +47,21 @@ export function weekStart(s: DateStr): DateStr {
 export function monthStr(s: DateStr): string {
   return s.slice(0, 7) // 'YYYY-MM'
 }
+
+/** 'YYYY-MM' → 'YYYY-MM' shifted by n months. */
+export function addMonths(month: string, n: number): string {
+  const [y, m] = month.split('-').map(Number)
+  const d = new Date(y, m - 1 + n, 1)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}
+
+export function daysInMonth(month: string): number {
+  const [y, m] = month.split('-').map(Number)
+  return new Date(y, m, 0).getDate()
+}
+
+/** 'YYYY-MM' → 'Sep 2026' */
+export function monthLabel(month: string): string {
+  const [y, m] = month.split('-').map(Number)
+  return new Date(y, m - 1, 1).toLocaleString('en', { month: 'short', year: 'numeric' })
+}
