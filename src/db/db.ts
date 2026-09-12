@@ -112,5 +112,9 @@ export function newId(): string {
 // Dev-only console access: `__db.query('SELECT ...')` / `__db.run('INSERT ...')`
 // in the browser DevTools. Stripped from production builds by Vite.
 if (import.meta.env.DEV) {
-  ;(window as unknown as { __db: unknown }).__db = { query, run, newId }
+  ;(window as unknown as { __db: unknown }).__db = {
+    query: async (sql: string, params?: unknown[]) => { await initDb(); return query(sql, params) },
+    run: async (sql: string, params?: unknown[]) => { await initDb(); return run(sql, params) },
+    newId,
+  }
 }

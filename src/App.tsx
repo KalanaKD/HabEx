@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { IconType } from 'react-icons'
 import { LuChartPie, LuCircleCheck, LuSun, LuWallet } from 'react-icons/lu'
+import BudgetSettings from './features/budgets/BudgetSettings'
 import ExpenseList from './features/expenses/ExpenseList'
 import HabitList from './features/habits/HabitList'
 
@@ -31,7 +32,7 @@ function App() {
         {tab === 'today' && <Placeholder name="Today screen" step={8} />}
         {tab === 'habits' && <HabitList />}
         {tab === 'expenses' && <ExpenseList />}
-        {tab === 'budgets' && <Placeholder name="Budgets" step={6} />}
+        {tab === 'budgets' && <BudgetSettings />}
       </main>
 
       <nav className="fixed inset-x-0 bottom-0 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)]">

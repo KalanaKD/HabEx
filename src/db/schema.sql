@@ -52,3 +52,11 @@ CREATE TABLE IF NOT EXISTS goals (
   target_amount REAL NOT NULL,
   current_amount REAL DEFAULT 0
 );
+
+-- Added after the brief: small key/value store for per-month settings such
+-- as the income to allocate ('income:YYYY-MM'). IF NOT EXISTS makes this
+-- safe on databases created before the table existed.
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
