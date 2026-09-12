@@ -70,7 +70,7 @@ export default function HabitList() {
           <HabitRow
             key={h.id}
             habit={h}
-            onToggle={() => (h.completedToday ? uncomplete(h) : complete(h))}
+            onToggle={(origin) => (h.completedToday ? uncomplete(h) : complete(h, origin))}
             onEdit={() => setEditing(h)}
           />
         ))}

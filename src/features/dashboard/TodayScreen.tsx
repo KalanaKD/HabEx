@@ -60,7 +60,7 @@ export default function TodayScreen({ onOpenTab, onOpenSettings }: { onOpenTab: 
         )}
         <ul className="space-y-2">
           {due.map((h) => (
-            <HabitRow key={h.id} habit={h} onToggle={() => (h.completedToday ? habits.uncomplete(h) : habits.complete(h))} onEdit={() => onOpenTab('habits')} />
+            <HabitRow key={h.id} habit={h} onToggle={(origin) => (h.completedToday ? habits.uncomplete(h) : habits.complete(h, origin))} onEdit={() => onOpenTab('habits')} />
           ))}
         </ul>
       </section>

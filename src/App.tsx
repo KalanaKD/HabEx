@@ -6,6 +6,8 @@ import TodayScreen from './features/dashboard/TodayScreen'
 import ExpenseList from './features/expenses/ExpenseList'
 import HabitList from './features/habits/HabitList'
 import SettingsScreen from './features/settings/SettingsScreen'
+import LevelUp from './components/LevelUp'
+import Toaster from './components/Toaster'
 
 type Tab = 'today' | 'habits' | 'expenses' | 'budgets'
 type Screen = Tab | 'settings' // settings isn't in the tab bar
@@ -23,6 +25,8 @@ function App() {
 
   return (
     <div className="flex min-h-screen flex-col bg-canvas">
+      <Toaster />
+      <LevelUp />
       {/* pb-24 leaves room for the fixed tab bar */}
       <main className="mx-auto w-full max-w-md flex-1 p-4 pb-24">
         {tab === 'today' && <TodayScreen onOpenTab={setTab} onOpenSettings={() => setTab('settings')} />}
