@@ -31,3 +31,6 @@ android/local.properties
 android/.idea
 android/*.iml
 android/app/*.iml
+
+# SQLite WASM binary, copied from node_modules by the postinstall script
+public/assets/sql-wasm.wasm

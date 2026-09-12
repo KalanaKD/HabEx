@@ -10,24 +10,31 @@
     "preview": "vite preview",
     "sync": "npm run build && npx cap sync android",
     "android": "npm run sync && npx cap open android",
-    "apk": "npm run sync && cd android && ./gradlew assembleDebug"
+    "apk": "npm run sync && cd android && ./gradlew assembleDebug",
+    "postinstall": "cp node_modules/sql.js/dist/sql-wasm.wasm public/assets/sql-wasm.wasm"
   },
   "dependencies": {
+    "@capacitor-community/sqlite": "^8.1.1",
     "@capacitor/android": "^8.5.2",
     "@capacitor/core": "^8.5.2",
+    "jeep-sqlite": "^2.8.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.6.9",
+    "@capacitor/cli": "^8.5.2",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
     "oxlint": "^1.81.0",
+    "sql.js": "^1.11.0",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
+  },
+  "overrides": {
+    "sql.js": "1.11.0"
   }
 }
