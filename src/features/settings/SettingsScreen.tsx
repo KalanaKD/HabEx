@@ -3,6 +3,7 @@ import { LuArrowLeft, LuBell, LuLock, LuMonitor, LuMoon, LuSun } from 'react-ico
 import { authenticate, canLock, isLockEnabled, setLockEnabled, type LockCapability } from '../../lib/appLock'
 import { INACTIVITY_HOURS, isReminderEnabled, setReminderEnabled } from '../../lib/reminders'
 import { getThemePref, setThemePref, type ThemePref } from '../../lib/theme'
+import DataSection from './DataSection'
 
 const THEMES: { value: ThemePref; label: string; Icon: typeof LuSun }[] = [
   { value: 'system', label: 'System', Icon: LuMonitor },
@@ -102,6 +103,9 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
         </label>
         {reminderMsg && <p className="mt-2 text-xs text-ink-soft">{reminderMsg}</p>}
       </section>
+
+      {/* After a restore every screen's cached state is stale; going back remounts Today. */}
+      <DataSection onRestored={() => { setTheme(getThemePref()); onBack() }} />
     </div>
   )
 }

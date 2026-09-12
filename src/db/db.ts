@@ -104,6 +104,16 @@ export async function run(sql: string, params: unknown[] = []): Promise<number> 
   return result.changes?.changes ?? 0
 }
 
+/**
+ * Run many statements in ONE transaction: all succeed or none are applied.
+ * Used by restore, where a half-applied backup would be worse than none.
+ */
+export async function runBatch(set: { statement: string; values?: unknown[] }[]): Promise<void> {
+  if (set.length === 0) return
+  await requireDb().executeSet(set.map((s) => ({ statement: s.statement, values: s.values ?? [] })), true)
+  if (isWeb) await sqlite.saveToStore(DB_NAME)
+}
+
 /** Generate a primary key. All tables use TEXT ids (UUIDs). */
 export function newId(): string {
   return crypto.randomUUID()
