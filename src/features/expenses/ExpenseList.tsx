@@ -3,6 +3,8 @@ import { LuChevronLeft, LuChevronRight, LuPlus, LuRepeat, LuTags } from 'react-i
 import { addMonths, monthLabel, parseDateStr } from '../../lib/dates'
 import { formatMoney } from '../../lib/money'
 import { GROUP_STYLE } from '../../components/ui'
+import ViewToggle, { type View } from '../../components/ViewToggle'
+import ExpenseDashboard from '../dashboard/ExpenseDashboard'
 import CategoryManager from './CategoryManager'
 import ExpenseForm from './ExpenseForm'
 import type { Expense, ExpenseWithCategory } from './types'
@@ -11,6 +13,7 @@ import { useExpenses } from './useExpenses'
 export default function ExpenseList() {
   const x = useExpenses()
   const [screen, setScreen] = useState<'list' | 'new' | 'categories' | Expense>('list')
+  const [view, setView] = useState<View>('list')
 
   if (screen === 'categories') {
     return (
@@ -52,6 +55,7 @@ export default function ExpenseList() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-800">Expenses</h1>
         <div className="flex items-center gap-2">
+          <ViewToggle view={view} onChange={setView} />
           <button onClick={() => setScreen('categories')} aria-label="Categories" className="rounded-lg bg-slate-200 p-2.5 text-slate-600"><LuTags /></button>
           <button onClick={() => setScreen('new')} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white">
             <LuPlus /> Add
@@ -68,6 +72,8 @@ export default function ExpenseList() {
         <button onClick={() => x.setMonth(addMonths(x.month, 1))} aria-label="Next month" className="p-2 text-slate-500"><LuChevronRight /></button>
       </div>
 
+      {view === 'stats' && <ExpenseDashboard month={x.month} />}
+      {view === 'list' && (<>
       {x.error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{x.error}</p>}
       {x.loading && <p className="text-sm text-slate-400">Loading…</p>}
       {!x.loading && x.expenses.length === 0 && (
@@ -94,6 +100,7 @@ export default function ExpenseList() {
           </ul>
         </section>
       ))}
+      </>)}
     </div>
   )
 }

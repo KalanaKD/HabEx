@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { LuChartColumn, LuCheck, LuFlame, LuList, LuPlus } from 'react-icons/lu'
+import { LuCheck, LuFlame, LuPlus } from 'react-icons/lu'
+import ViewToggle, { type View } from '../../components/ViewToggle'
 import { pointsEarned } from '../../lib/points'
 import HabitDashboard from '../dashboard/HabitDashboard'
 import HabitForm from './HabitForm'
@@ -17,7 +18,7 @@ export default function HabitList() {
   const { habits, loading, error, create, update, remove, complete, uncomplete } = useHabits()
   // null = list view; 'new' = create form; a Habit = edit form for it
   const [editing, setEditing] = useState<'new' | Habit | null>(null)
-  const [view, setView] = useState<'list' | 'stats'>('list')
+  const [view, setView] = useState<View>('list')
 
   if (editing) {
     const habit = editing === 'new' ? undefined : editing
@@ -85,23 +86,6 @@ export default function HabitList() {
   )
 }
 
-function ViewToggle({ view, onChange }: { view: 'list' | 'stats'; onChange: (v: 'list' | 'stats') => void }) {
-  const btn = (v: 'list' | 'stats', Icon: typeof LuList, label: string) => (
-    <button
-      onClick={() => onChange(v)}
-      aria-label={label}
-      className={`rounded-md p-2 ${view === v ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}
-    >
-      <Icon />
-    </button>
-  )
-  return (
-    <div className="flex rounded-lg bg-slate-200 p-0.5">
-      {btn('list', LuList, 'List')}
-      {btn('stats', LuChartColumn, 'Stats')}
-    </div>
-  )
-}
 
 function HabitRow({ habit: h, onToggle, onEdit }: { habit: HabitWithStatus; onToggle: () => void; onEdit: () => void }) {
   // What completing *now* would award: streak grows by one if today isn't done yet.
