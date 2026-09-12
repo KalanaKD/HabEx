@@ -39,3 +39,6 @@ public/assets/sql-wasm.wasm
 android/keystore.properties
 android/*.keystore
 android/*.jks
+
+# Built APKs
+release/
