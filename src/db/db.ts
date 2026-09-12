@@ -92,3 +92,9 @@ export async function run(sql: string, params: unknown[] = []): Promise<number> 
 export function newId(): string {
   return crypto.randomUUID()
 }
+
+// Dev-only console access: `__db.query('SELECT ...')` / `__db.run('INSERT ...')`
+// in the browser DevTools. Stripped from production builds by Vite.
+if (import.meta.env.DEV) {
+  ;(window as unknown as { __db: unknown }).__db = { query, run, newId }
+}

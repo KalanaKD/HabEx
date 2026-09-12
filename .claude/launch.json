@@ -3,8 +3,11 @@
   "configurations": [
     {
       "name": "vite-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "5173", "--strictPort"],
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-lc",
+        "source ~/.nvm/nvm.sh && npm run dev -- --port 5173 --strictPort"
+      ],
       "port": 5173
     }
   ]

@@ -1,13 +1,15 @@
 import { useState } from 'react'
+import type { IconType } from 'react-icons'
+import { LuChartPie, LuCircleCheck, LuSun, LuWallet } from 'react-icons/lu'
 import HabitList from './features/habits/HabitList'
 
 type Tab = 'today' | 'habits' | 'expenses' | 'budgets'
 
-const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: 'today', label: 'Today', icon: '☀️' },
-  { id: 'habits', label: 'Habits', icon: '✅' },
-  { id: 'expenses', label: 'Expenses', icon: '💸' },
-  { id: 'budgets', label: 'Budgets', icon: '📊' },
+const TABS: { id: Tab; label: string; icon: IconType }[] = [
+  { id: 'today', label: 'Today', icon: LuSun },
+  { id: 'habits', label: 'Habits', icon: LuCircleCheck },
+  { id: 'expenses', label: 'Expenses', icon: LuWallet },
+  { id: 'budgets', label: 'Budgets', icon: LuChartPie },
 ]
 
 function Placeholder({ name, step }: { name: string; step: number }) {
@@ -39,7 +41,7 @@ function App() {
                 onClick={() => setTab(t.id)}
                 className={`flex w-full flex-col items-center py-2 text-xs ${tab === t.id ? 'text-indigo-600' : 'text-slate-500'}`}
               >
-                <span className="text-xl">{t.icon}</span>
+                <t.icon className="mb-0.5 text-xl" />
                 {t.label}
               </button>
             </li>

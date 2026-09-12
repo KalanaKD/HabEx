@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { LuChartColumn, LuCheck, LuFlame, LuList, LuPlus } from 'react-icons/lu'
 import { pointsEarned } from '../../lib/points'
+import HabitDashboard from '../dashboard/HabitDashboard'
 import HabitForm from './HabitForm'
 import type { Habit, HabitWithStatus } from './types'
 import { useHabits } from './useHabits'
@@ -15,6 +17,7 @@ export default function HabitList() {
   const { habits, loading, error, create, update, remove, complete, uncomplete } = useHabits()
   // null = list view; 'new' = create form; a Habit = edit form for it
   const [editing, setEditing] = useState<'new' | Habit | null>(null)
+  const [view, setView] = useState<'list' | 'stats'>('list')
 
   if (editing) {
     const habit = editing === 'new' ? undefined : editing
@@ -45,16 +48,25 @@ export default function HabitList() {
             <p className="text-sm text-slate-500">{done} of {habits.length} done today</p>
           )}
         </div>
-        <button onClick={() => setEditing('new')} className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white">
-          + New
-        </button>
+        <div className="flex items-center gap-2">
+          <ViewToggle view={view} onChange={setView} />
+          <button
+            onClick={() => setEditing('new')}
+            className="flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white"
+          >
+            <LuPlus /> New
+          </button>
+        </div>
       </div>
+
+      {view === 'stats' && <HabitDashboard />}
+      {view === 'list' && (<>
 
       {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
       {loading && <p className="text-sm text-slate-400">Loading…</p>}
       {!loading && habits.length === 0 && (
         <p className="rounded-xl bg-white p-6 text-center text-sm text-slate-400 shadow">
-          No habits yet. Tap <span className="font-medium">+ New</span> to add one, or pick a template.
+          No habits yet. Tap <span className="font-medium">New</span> to add one, or pick a template.
         </p>
       )}
 
@@ -68,6 +80,25 @@ export default function HabitList() {
           />
         ))}
       </ul>
+      </>)}
+    </div>
+  )
+}
+
+function ViewToggle({ view, onChange }: { view: 'list' | 'stats'; onChange: (v: 'list' | 'stats') => void }) {
+  const btn = (v: 'list' | 'stats', Icon: typeof LuList, label: string) => (
+    <button
+      onClick={() => onChange(v)}
+      aria-label={label}
+      className={`rounded-md p-2 ${view === v ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}
+    >
+      <Icon />
+    </button>
+  )
+  return (
+    <div className="flex rounded-lg bg-slate-200 p-0.5">
+      {btn('list', LuList, 'List')}
+      {btn('stats', LuChartColumn, 'Stats')}
     </div>
   )
 }
@@ -84,14 +115,14 @@ function HabitRow({ habit: h, onToggle, onEdit }: { habit: HabitWithStatus; onTo
           h.completedToday ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-300 text-transparent active:bg-slate-100'
         }`}
       >
-        ✓
+        <LuCheck strokeWidth={3} />
       </button>
       <button onClick={onEdit} className="min-w-0 flex-1 text-left">
         <div className={`truncate font-medium text-slate-800 ${h.completedToday ? 'line-through' : ''}`}>{h.name}</div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500">
           <span className={`rounded px-1.5 py-0.5 capitalize ${DIFF_COLOR[h.difficulty]}`}>{h.difficulty}</span>
           <span className="capitalize">{h.type === 'todo' ? 'to-do' : h.schedule ?? h.type}</span>
-          {h.streak > 0 && <span>🔥 {h.streak}</span>}
+          {h.streak > 0 && <span className="flex items-center gap-0.5"><LuFlame className="text-orange-500" />{h.streak}</span>}
           {h.science_tag && <span className="truncate text-slate-400">· {h.science_tag}</span>}
         </div>
       </button>
