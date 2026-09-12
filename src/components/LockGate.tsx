@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { App as CapApp } from '@capacitor/app'
 import { LuLock } from 'react-icons/lu'
 import { authenticate, isLockEnabled, RELOCK_AFTER_MS } from '../lib/appLock'
+import { reschedule } from '../lib/reminders'
 
 /**
  * Renders children only once the user has authenticated (when the lock is
@@ -31,7 +32,9 @@ export default function LockGate({ children }: { children: React.ReactNode }) {
   // Background / foreground tracking. The biometric prompt itself can briefly
   // pause the activity, so `busy` guards against re-locking mid-prompt.
   useEffect(() => {
+    void reschedule() // app opened: push the inactivity reminder out 12 h
     const sub = CapApp.addListener('appStateChange', ({ isActive }) => {
+      void reschedule() // any foreground/background transition counts as use
       if (!isLockEnabled() || busy.current) return
       if (!isActive) {
         hiddenAt.current = Date.now()

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { LuArrowLeft, LuLock, LuMonitor, LuMoon, LuSun } from 'react-icons/lu'
+import { LuArrowLeft, LuBell, LuLock, LuMonitor, LuMoon, LuSun } from 'react-icons/lu'
 import { authenticate, canLock, isLockEnabled, setLockEnabled, type LockCapability } from '../../lib/appLock'
+import { INACTIVITY_HOURS, isReminderEnabled, setReminderEnabled } from '../../lib/reminders'
 import { getThemePref, setThemePref, type ThemePref } from '../../lib/theme'
 
 const THEMES: { value: ThemePref; label: string; Icon: typeof LuSun }[] = [
@@ -14,6 +15,14 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
   const [lock, setLock] = useState(isLockEnabled)
   const [cap, setCap] = useState<LockCapability | null>(null)
   const [lockMsg, setLockMsg] = useState<string | null>(null)
+  const [reminder, setReminder] = useState(isReminderEnabled)
+  const [reminderMsg, setReminderMsg] = useState<string | null>(null)
+
+  async function toggleReminder(on: boolean) {
+    const res = await setReminderEnabled(on)
+    setReminderMsg(res.message ?? null)
+    if (res.ok) setReminder(on)
+  }
 
   useEffect(() => { void canLock().then(setCap) }, [])
 
@@ -77,6 +86,21 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
           <input type="checkbox" className="h-5 w-5 accent-indigo-600" checked={lock} disabled={!cap?.available} onChange={toggleLock} />
         </label>
         {lockMsg && <p className="mt-2 text-xs text-red-600 dark:text-red-300">{lockMsg}</p>}
+      </section>
+
+      <section className="rounded-xl bg-surface p-4 shadow">
+        <h2 className="mb-2 text-sm font-semibold text-ink-2">Reminders</h2>
+        <label className="flex items-center gap-3">
+          <LuBell className="text-xl text-ink-soft" />
+          <span className="flex-1">
+            <span className="block text-sm font-medium text-ink">Inactivity nudge</span>
+            <span className="block text-xs text-ink-soft">
+              A notification if you haven't opened HabEx for {INACTIVITY_HOURS} hours.
+            </span>
+          </span>
+          <input type="checkbox" className="h-5 w-5 accent-indigo-600" checked={reminder} onChange={(e) => toggleReminder(e.target.checked)} />
+        </label>
+        {reminderMsg && <p className="mt-2 text-xs text-ink-soft">{reminderMsg}</p>}
       </section>
     </div>
   )
