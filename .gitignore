@@ -34,3 +34,8 @@ android/app/*.iml
 
 # SQLite WASM binary, copied from node_modules by the postinstall script
 public/assets/sql-wasm.wasm
+
+# Release signing — never commit the keystore or its passwords
+android/keystore.properties
+android/*.keystore
+android/*.jks
