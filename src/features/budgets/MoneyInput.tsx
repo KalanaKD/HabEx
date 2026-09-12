@@ -29,7 +29,7 @@ export default function MoneyInput({ value, onCommit, className = '', placeholde
       onChange={(e) => setDraft(e.target.value)}
       onBlur={commit}
       onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
-      className={`rounded-lg border border-slate-300 px-2 py-1.5 text-right focus:border-indigo-500 focus:outline-none ${className}`}
+      className={`rounded-lg border border-edge-strong bg-surface px-2 py-1.5 text-right text-ink focus:border-indigo-500 focus:outline-none ${className}`}
       aria-label={rest['aria-label']}
     />
   )

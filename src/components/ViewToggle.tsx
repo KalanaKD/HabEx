@@ -9,13 +9,13 @@ export default function ViewToggle({ view, onChange }: { view: View; onChange: (
     <button
       onClick={() => onChange(v)}
       aria-label={label}
-      className={`rounded-md p-2 ${view === v ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500'}`}
+      className={`rounded-md p-2 ${view === v ? 'bg-surface text-accent shadow-sm' : 'text-ink-soft'}`}
     >
       <Icon />
     </button>
   )
   return (
-    <div className="flex rounded-lg bg-slate-200 p-0.5">
+    <div className="flex rounded-lg bg-well-strong p-0.5">
       {btn('list', LuList, 'List')}
       {btn('stats', LuChartColumn, 'Stats')}
     </div>

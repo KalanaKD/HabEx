@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BASE_POINTS, type Difficulty } from '../../lib/points'
 import { HABIT_TEMPLATES, type HabitType, type Schedule } from '../../lib/scienceTips'
+import { field, label } from '../../components/ui'
 import type { Habit, HabitInput } from './types'
 
 interface Props {
@@ -53,12 +54,10 @@ export default function HabitForm({ initial, onSubmit, onDelete, onCancel }: Pro
     }
   }
 
-  const field = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none'
-  const label = 'mb-1 block text-sm font-medium text-slate-600'
-
+  
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-lg font-semibold text-slate-800">{initial ? 'Edit habit' : 'New habit'}</h2>
+      <h2 className="text-lg font-semibold text-ink">{initial ? 'Edit habit' : 'New habit'}</h2>
 
       {!initial && (
         <div>
@@ -85,10 +84,10 @@ export default function HabitForm({ initial, onSubmit, onDelete, onCancel }: Pro
               key={t.value}
               type="button"
               onClick={() => setType(t.value)}
-              className={`rounded-lg border px-2 py-2 text-sm ${type === t.value ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-slate-300 text-slate-600'}`}
+              className={`rounded-lg border px-2 py-2 text-sm ${type === t.value ? 'border-accent bg-accent-soft text-accent' : 'border-edge-strong text-ink-muted'}`}
             >
               <div className="font-medium">{t.label}</div>
-              <div className="text-xs text-slate-400">{t.hint}</div>
+              <div className="text-xs text-ink-faint">{t.hint}</div>
             </button>
           ))}
         </div>
@@ -102,10 +101,10 @@ export default function HabitForm({ initial, onSubmit, onDelete, onCancel }: Pro
               key={d}
               type="button"
               onClick={() => setDifficulty(d)}
-              className={`rounded-lg border px-2 py-2 text-sm capitalize ${difficulty === d ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-slate-300 text-slate-600'}`}
+              className={`rounded-lg border px-2 py-2 text-sm capitalize ${difficulty === d ? 'border-accent bg-accent-soft text-accent' : 'border-edge-strong text-ink-muted'}`}
             >
               {d}
-              <div className="text-xs text-slate-400">{BASE_POINTS[d]} pts</div>
+              <div className="text-xs text-ink-faint">{BASE_POINTS[d]} pts</div>
             </button>
           ))}
         </div>
@@ -123,7 +122,7 @@ export default function HabitForm({ initial, onSubmit, onDelete, onCancel }: Pro
       )}
 
       <div>
-        <label className={label}>Science tag <span className="font-normal text-slate-400">(optional)</span></label>
+        <label className={label}>Science tag <span className="font-normal text-ink-faint">(optional)</span></label>
         <input className={field} value={scienceTag} onChange={(e) => setScienceTag(e.target.value)} placeholder="e.g. Fogg tiny habit" />
       </div>
 
@@ -131,19 +130,19 @@ export default function HabitForm({ initial, onSubmit, onDelete, onCancel }: Pro
         <button type="submit" disabled={saving || !name.trim()} className="flex-1 rounded-lg bg-indigo-600 py-2.5 font-medium text-white disabled:opacity-50">
           {saving ? 'Saving…' : initial ? 'Save' : 'Create'}
         </button>
-        <button type="button" onClick={onCancel} className="rounded-lg border border-slate-300 px-4 py-2.5 text-slate-600">
+        <button type="button" onClick={onCancel} className="rounded-lg border border-edge-strong px-4 py-2.5 text-ink-muted">
           Cancel
         </button>
       </div>
 
       {initial && onDelete && (
-        <div className="border-t border-slate-200 pt-3">
+        <div className="border-t border-edge pt-3">
           {confirmDelete ? (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-600">Delete permanently, including its logs?</span>
+              <span className="text-ink-muted">Delete permanently, including its logs?</span>
               <div className="flex gap-2">
                 <button type="button" onClick={onDelete} className="rounded bg-red-600 px-3 py-1 text-white">Delete</button>
-                <button type="button" onClick={() => setConfirmDelete(false)} className="px-2 text-slate-500">Keep</button>
+                <button type="button" onClick={() => setConfirmDelete(false)} className="px-2 text-ink-soft">Keep</button>
               </div>
             </div>
           ) : (

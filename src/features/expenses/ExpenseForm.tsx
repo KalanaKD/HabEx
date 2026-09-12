@@ -40,7 +40,7 @@ export default function ExpenseForm({ categories, initial, onSubmit, onDelete, o
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-lg font-semibold text-slate-800">{initial ? 'Edit expense' : 'New expense'}</h2>
+      <h2 className="text-lg font-semibold text-ink">{initial ? 'Edit expense' : 'New expense'}</h2>
 
       <div>
         <label className={label}>Amount ({CURRENCY})</label>
@@ -63,15 +63,15 @@ export default function ExpenseForm({ categories, initial, onSubmit, onDelete, o
       </div>
 
       <div>
-        <label className={label}>Note <span className="font-normal text-slate-400">(optional)</span></label>
+        <label className={label}>Note <span className="font-normal text-ink-faint">(optional)</span></label>
         <input className={field} value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. Weekly shop" />
       </div>
 
-      <label className="flex items-center gap-3 rounded-lg border border-slate-200 p-3">
+      <label className="flex items-center gap-3 rounded-lg border border-edge p-3">
         <input type="checkbox" checked={recurring} onChange={(e) => setRecurring(e.target.checked)} className="h-5 w-5 accent-indigo-600" />
         <span className="flex-1 text-sm">
-          <span className="flex items-center gap-1 font-medium text-slate-700"><LuRepeat /> Repeats monthly</span>
-          <span className="text-slate-500">
+          <span className="flex items-center gap-1 font-medium text-ink-2"><LuRepeat /> Repeats monthly</span>
+          <span className="text-ink-soft">
             {isCopy
               ? 'Auto-added from a recurring expense. Untick to detach this month only.'
               : 'A copy is added on the same day each month. Edit this one to change future months.'}
@@ -83,19 +83,19 @@ export default function ExpenseForm({ categories, initial, onSubmit, onDelete, o
         <button type="submit" disabled={saving || !valid} className="flex-1 rounded-lg bg-indigo-600 py-2.5 font-medium text-white disabled:opacity-50">
           {saving ? 'Saving…' : initial ? 'Save' : 'Add'}
         </button>
-        <button type="button" onClick={onCancel} className="rounded-lg border border-slate-300 px-4 py-2.5 text-slate-600">Cancel</button>
+        <button type="button" onClick={onCancel} className="rounded-lg border border-edge-strong px-4 py-2.5 text-ink-muted">Cancel</button>
       </div>
 
       {initial && onDelete && (
-        <div className="border-t border-slate-200 pt-3">
+        <div className="border-t border-edge pt-3">
           {confirmDelete ? (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-600">
+              <span className="text-ink-muted">
                 {initial.is_recurring && !isCopy ? 'Delete? Past copies are kept; no new ones.' : 'Delete this expense?'}
               </span>
               <div className="flex gap-2">
                 <button type="button" onClick={onDelete} className="rounded bg-red-600 px-3 py-1 text-white">Delete</button>
-                <button type="button" onClick={() => setConfirmDelete(false)} className="px-2 text-slate-500">Keep</button>
+                <button type="button" onClick={() => setConfirmDelete(false)} className="px-2 text-ink-soft">Keep</button>
               </div>
             </div>
           ) : (

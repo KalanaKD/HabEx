@@ -1,1 +1,45 @@
 @import "tailwindcss";
+
+/* Dark mode is driven by a `.dark` class on <html> (set by lib/theme.ts),
+   not by the OS media query alone, so the user can override it. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Semantic colour tokens. Components use these (bg-surface, text-ink, …)
+   instead of raw palette classes, so dark mode is a variable swap. */
+@theme {
+  --color-canvas: #f8fafc;       /* page background        (slate-50)  */
+  --color-surface: #ffffff;      /* cards, inputs, tab bar             */
+  --color-well: #f1f5f9;         /* inset areas, chips     (slate-100) */
+  --color-well-strong: #e2e8f0;  /* segmented controls     (slate-200) */
+  --color-edge: #e2e8f0;         /* dividers               (slate-200) */
+  --color-edge-strong: #cbd5e1;  /* input borders          (slate-300) */
+  --color-ink: #1e293b;          /* headings, primary text (slate-800) */
+  --color-ink-2: #334155;        /* secondary headings     (slate-700) */
+  --color-ink-muted: #475569;    /* labels                 (slate-600) */
+  --color-ink-soft: #64748b;     /* helper text            (slate-500) */
+  --color-ink-faint: #94a3b8;    /* placeholders, hints    (slate-400) */
+  --color-accent: #4f46e5;       /* links, selected state  (indigo-600) */
+  --color-accent-soft: #eef2ff;  /* selected backgrounds   (indigo-50)  */
+}
+
+.dark {
+  --color-canvas: #0b1120;
+  --color-surface: #151e2e;
+  --color-well: #1e293b;
+  --color-well-strong: #334155;
+  --color-edge: #273449;
+  --color-edge-strong: #3b4a61;
+  --color-ink: #f1f5f9;
+  --color-ink-2: #e2e8f0;
+  --color-ink-muted: #cbd5e1;
+  --color-ink-soft: #94a3b8;
+  --color-ink-faint: #64748b;
+  --color-accent: #a5b4fc;
+  --color-accent-soft: #1e1b4b;
+  color-scheme: dark; /* native controls (date picker, scrollbars) follow */
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+}

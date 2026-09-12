@@ -17,7 +17,7 @@ export default function HabitList() {
   if (editing) {
     const habit = editing === 'new' ? undefined : editing
     return (
-      <div className="rounded-xl bg-white p-4 shadow">
+      <div className="rounded-xl bg-surface p-4 shadow">
         <HabitForm
           initial={habit}
           onCancel={() => setEditing(null)}
@@ -38,9 +38,9 @@ export default function HabitList() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Habits</h1>
+          <h1 className="text-2xl font-bold text-ink">Habits</h1>
           {habits.length > 0 && (
-            <p className="text-sm text-slate-500">{done} of {habits.length} done today</p>
+            <p className="text-sm text-ink-soft">{done} of {habits.length} done today</p>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -57,10 +57,10 @@ export default function HabitList() {
       {view === 'stats' && <HabitDashboard />}
       {view === 'list' && (<>
 
-      {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-      {loading && <p className="text-sm text-slate-400">Loading…</p>}
+      {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">{error}</p>}
+      {loading && <p className="text-sm text-ink-faint">Loading…</p>}
       {!loading && habits.length === 0 && (
-        <p className="rounded-xl bg-white p-6 text-center text-sm text-slate-400 shadow">
+        <p className="rounded-xl bg-surface p-6 text-center text-sm text-ink-faint shadow">
           No habits yet. Tap <span className="font-medium">New</span> to add one, or pick a template.
         </p>
       )}
