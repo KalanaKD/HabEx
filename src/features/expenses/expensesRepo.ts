@@ -95,3 +95,9 @@ export async function monthTotals(month: string): Promise<{ total: number; byCat
   const byCategory = new Map(rows.map((r) => [r.category_id, r.total]))
   return { total: rows.reduce((s, r) => s + r.total, 0), byCategory }
 }
+
+/** Total spent on one day. */
+export async function daySpend(date: string): Promise<number> {
+  const rows = await query<{ total: number | null }>('SELECT SUM(amount) AS total FROM expenses WHERE spent_on = ?', [date])
+  return rows[0]?.total ?? 0
+}

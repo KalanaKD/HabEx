@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { IconType } from 'react-icons'
 import { LuChartPie, LuCircleCheck, LuSun, LuWallet } from 'react-icons/lu'
 import BudgetSettings from './features/budgets/BudgetSettings'
+import TodayScreen from './features/dashboard/TodayScreen'
 import ExpenseList from './features/expenses/ExpenseList'
 import HabitList from './features/habits/HabitList'
 
@@ -14,22 +15,15 @@ const TABS: { id: Tab; label: string; icon: IconType }[] = [
   { id: 'budgets', label: 'Budgets', icon: LuChartPie },
 ]
 
-function Placeholder({ name, step }: { name: string; step: number }) {
-  return (
-    <div className="rounded-xl bg-white p-6 text-center text-sm text-slate-400 shadow">
-      {name} — coming in build step {step}
-    </div>
-  )
-}
 
 function App() {
-  const [tab, setTab] = useState<Tab>('habits')
+  const [tab, setTab] = useState<Tab>('today')
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
       {/* pb-24 leaves room for the fixed tab bar */}
       <main className="mx-auto w-full max-w-md flex-1 p-4 pb-24">
-        {tab === 'today' && <Placeholder name="Today screen" step={8} />}
+        {tab === 'today' && <TodayScreen onOpenTab={setTab} />}
         {tab === 'habits' && <HabitList />}
         {tab === 'expenses' && <ExpenseList />}
         {tab === 'budgets' && <BudgetSettings />}

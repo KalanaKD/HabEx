@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.kalana.habitexpense',
-  appName: 'Habit Expense Tracker',
+  appName: 'HabEx',
   webDir: 'dist'
 };
 

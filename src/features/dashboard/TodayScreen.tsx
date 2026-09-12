@@ -1,0 +1,127 @@
+import { useState } from 'react'
+import { LuCircleAlert, LuPlus, LuTriangleAlert, LuTrophy } from 'react-icons/lu'
+import { isWeekday, parseDateStr, todayStr } from '../../lib/dates'
+import { formatMoney } from '../../lib/money'
+import { levelFromPoints } from '../../lib/points'
+import ExpenseForm from '../expenses/ExpenseForm'
+import { createExpense } from '../expenses/expensesRepo'
+import HabitRow from '../habits/HabitRow'
+import { useHabits } from '../habits/useHabits'
+import { useTodayMoney } from './useTodayMoney'
+
+export default function TodayScreen({ onOpenTab }: { onOpenTab: (tab: 'habits' | 'expenses' | 'budgets') => void }) {
+  const habits = useHabits()
+  const money = useTodayMoney()
+  const [addingExpense, setAddingExpense] = useState(false)
+  const today = todayStr()
+
+  // Weekday-scheduled habits aren't due on weekends; everything else is.
+  const due = habits.habits.filter((h) => h.schedule !== 'weekdays' || isWeekday(today))
+  const done = due.filter((h) => h.completedToday).length
+  const totalPoints = habits.habits.reduce((s, h) => s + h.totalPoints, 0)
+
+  if (addingExpense && money.data) {
+    return (
+      <div className="rounded-xl bg-white p-4 shadow">
+        <ExpenseForm
+          categories={money.data.categories}
+          onCancel={() => setAddingExpense(false)}
+          onSubmit={async (input) => { await createExpense(input); await money.reload(); setAddingExpense(false) }}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-800">Today</h1>
+        <p className="text-sm text-slate-500">{parseDateStr(today).toLocaleDateString('en', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+      </div>
+
+      {/* Habits */}
+      <section>
+        <div className="mb-1 flex items-center justify-between px-1">
+          <button onClick={() => onOpenTab('habits')} className="text-sm font-semibold text-slate-700">
+            Habits · {done}/{due.length} done
+          </button>
+          <span className="flex items-center gap-1 text-xs text-slate-500">
+            <LuTrophy className="text-amber-500" /> Level {levelFromPoints(totalPoints)} · {totalPoints} XP
+          </span>
+        </div>
+        {habits.error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{habits.error}</p>}
+        {!habits.loading && due.length === 0 && (
+          <p className="rounded-xl bg-white p-4 text-center text-sm text-slate-400 shadow">
+            Nothing due today. <button onClick={() => onOpenTab('habits')} className="font-medium text-indigo-600">Add a habit</button>
+          </p>
+        )}
+        <ul className="space-y-2">
+          {due.map((h) => (
+            <HabitRow key={h.id} habit={h} onToggle={() => (h.completedToday ? habits.uncomplete(h) : habits.complete(h))} onEdit={() => onOpenTab('habits')} />
+          ))}
+        </ul>
+      </section>
+
+      {/* Money */}
+      <section>
+        <div className="mb-1 flex items-center justify-between px-1">
+          <button onClick={() => onOpenTab('expenses')} className="text-sm font-semibold text-slate-700">Money</button>
+          <button onClick={() => setAddingExpense(true)} className="flex items-center gap-1 rounded-lg bg-indigo-600 px-2.5 py-1.5 text-xs font-medium text-white">
+            <LuPlus /> Expense
+          </button>
+        </div>
+        {money.error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{money.error}</p>}
+        {money.data && <MoneyCard {...money.data} onOpenTab={onOpenTab} />}
+      </section>
+    </div>
+  )
+}
+
+function MoneyCard({ today, monthSpent, income, allocated, overBudget, overspend, onOpenTab }: {
+  today: number; monthSpent: number; income: number; allocated: number; overBudget: string[]; overspend: string[]
+  onOpenTab: (tab: 'expenses' | 'budgets') => void
+}) {
+  const basis = income > 0 ? income : allocated
+  const left = basis - monthSpent
+  const pct = basis > 0 ? Math.min(100, (monthSpent / basis) * 100) : 0
+  return (
+    <div className="rounded-xl bg-white p-4 shadow">
+      <div className="grid grid-cols-2 gap-3">
+        <Stat label="Spent today" value={formatMoney(today)} />
+        <Stat label="This month" value={formatMoney(monthSpent)} />
+      </div>
+      {basis > 0 ? (
+        <div className="mt-3">
+          <div className="mb-1 flex justify-between text-xs text-slate-500">
+            <span>{left >= 0 ? `${formatMoney(left)} left` : `${formatMoney(-left)} over`} of {income > 0 ? 'income' : 'budget'}</span>
+            <span>{Math.round(pct)}%</span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+            <div className={`h-full rounded-full ${left < 0 ? 'bg-red-500' : pct >= 80 ? 'bg-amber-500' : 'bg-indigo-500'}`} style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+      ) : (
+        <button onClick={() => onOpenTab('budgets')} className="mt-3 text-xs text-indigo-600">Set this month's income and budgets →</button>
+      )}
+      {(overBudget.length > 0 || overspend.length > 0) && (
+        <ul className="mt-3 space-y-1 border-t border-slate-100 pt-3 text-xs">
+          {overBudget.length > 0 && (
+            <li className="flex items-start gap-1 text-red-600"><LuCircleAlert className="mt-0.5 shrink-0" /> Over budget: {overBudget.join(', ')}</li>
+          )}
+          {overspend.length > 0 && (
+            <li className="flex items-start gap-1 text-amber-700"><LuTriangleAlert className="mt-0.5 shrink-0" /> Above your 3-month average: {overspend.join(', ')}</li>
+          )}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="text-xs text-slate-500">{label}</div>
+      <div className="text-lg font-bold text-slate-800">{value}</div>
+    </div>
+  )
+}
