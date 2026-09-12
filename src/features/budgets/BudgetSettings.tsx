@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import { LuChevronLeft, LuChevronRight, LuCopy, LuTriangleAlert } from 'react-icons/lu'
+import ViewToggle, { type View } from '../../components/ViewToggle'
+import BudgetDashboard from '../dashboard/BudgetDashboard'
 import { GROUP_STYLE } from '../../components/ui'
 import { monthLabel } from '../../lib/dates'
 import { CURRENCY, formatMoney } from '../../lib/money'
@@ -11,16 +14,20 @@ const GROUPS: BudgetGroup[] = ['needs', 'wants', 'savings']
 
 export default function BudgetSettings() {
   const b = useBudgets()
+  const [view, setView] = useState<View>('list')
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-ink">Budgets</h1>
-        {b.copyFrom && (
-          <button onClick={b.copyPrevious} className="flex items-center gap-1 rounded-lg bg-well-strong px-3 py-2 text-sm text-ink-2">
-            <LuCopy /> Copy {monthLabel(b.copyFrom)}
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {b.copyFrom && view === 'list' && (
+            <button onClick={b.copyPrevious} className="flex items-center gap-1 rounded-lg bg-well-strong px-3 py-2 text-sm text-ink-2">
+              <LuCopy /> Copy {monthLabel(b.copyFrom)}
+            </button>
+          )}
+          <ViewToggle view={view} onChange={setView} />
+        </div>
       </div>
 
       <div className="flex items-center justify-between rounded-xl bg-surface p-3 shadow">
@@ -29,6 +36,8 @@ export default function BudgetSettings() {
         <button onClick={b.nextMonth} aria-label="Next month" className="p-2 text-ink-soft"><LuChevronRight /></button>
       </div>
 
+      {view === 'stats' && <BudgetDashboard rows={b.rows} income={b.income} />}
+      {view === 'list' && (<>
       <ZeroBasedCard income={b.income} allocated={b.allocated} unassigned={b.unassigned} onIncome={b.setIncome} />
 
       {b.error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300">{b.error}</p>}
@@ -50,6 +59,7 @@ export default function BudgetSettings() {
           </section>
         )
       })}
+      </>)}
     </div>
   )
 }

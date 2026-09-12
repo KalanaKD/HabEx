@@ -1,15 +1,10 @@
-import { Bar, BarChart, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { GROUP_STYLE } from '../../components/ui'
 import { formatMoney } from '../../lib/money'
-import { CATEGORY_COLORS, OTHER_COLOR, budgetVsActual, groupRatios, pieData, type CategorySpend, type PieSlice } from './expenseStats'
+import { Card, CategoryPie, Empty } from './chartParts'
+import { TOOLTIP_STYLE } from './chartTheme'
+import { budgetVsActual, groupRatios, pieData, type CategorySpend } from './expenseStats'
 import { useExpenseStats } from './useExpenseStats'
-
-// Recharts' default tooltip is styled inline (white); point it at our tokens.
-const TOOLTIP_STYLE = {
-  contentStyle: { background: 'var(--color-surface)', border: '1px solid var(--color-edge)', borderRadius: 8, color: 'var(--color-ink)', fontSize: 12 },
-  itemStyle: { color: 'var(--color-ink)' },
-  labelStyle: { color: 'var(--color-ink-soft)' },
-}
 
 export default function ExpenseDashboard({ month }: { month: string }) {
   const { rows, income, error } = useExpenseStats(month)
@@ -56,52 +51,6 @@ export default function ExpenseDashboard({ month }: { month: string }) {
           </ul>
         )}
       </Card>
-    </div>
-  )
-}
-
-function Card({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
-  return (
-    <section className="rounded-xl bg-surface p-4 shadow">
-      <div className="mb-3 flex items-baseline justify-between">
-        <h2 className="text-sm font-semibold text-ink-2">{title}</h2>
-        {subtitle && <span className="text-xs text-ink-soft">{subtitle}</span>}
-      </div>
-      {children}
-    </section>
-  )
-}
-
-function Empty({ text = 'No expenses this month.' }: { text?: string }) {
-  return <p className="text-sm text-ink-faint">{text}</p>
-}
-
-const colorOf = (s: PieSlice) => (s.colorIndex < 0 ? OTHER_COLOR : CATEGORY_COLORS[s.colorIndex])
-
-function CategoryPie({ slices }: { slices: PieSlice[] }) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="h-36 w-36 shrink-0">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie data={slices} dataKey="value" nameKey="name" innerRadius={38} outerRadius={64} paddingAngle={2}>
-              {slices.map((s) => <Cell key={s.name} fill={colorOf(s)} stroke="var(--color-surface)" strokeWidth={2} />)}
-            </Pie>
-            <Tooltip formatter={(v) => formatMoney(Number(v))} {...TOOLTIP_STYLE} />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-      {/* Visible legend with values: identity is never colour-alone */}
-      <ul className="min-w-0 flex-1 space-y-1 text-xs">
-        {slices.map((s) => (
-          <li key={s.name} className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: colorOf(s) }} />
-            <span className="min-w-0 flex-1 truncate text-ink-2">{s.name}</span>
-            <span className="text-ink-soft">{Math.round(s.pct * 100)}%</span>
-            <span className="w-20 text-right font-medium text-ink">{formatMoney(s.value)}</span>
-          </li>
-        ))}
-      </ul>
     </div>
   )
 }
