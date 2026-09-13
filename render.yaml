@@ -1,0 +1,25 @@
+# Render Blueprint: deploys the web build as a static site.
+# Dashboard → New → Blueprint → pick this repo; it reads this file.
+services:
+  - type: web
+    name: habex
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Supabase values are entered in the Render dashboard (sync: false = ask me)
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+    routes:
+      # Single-page app: every path serves index.html (refresh / deep links)
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY

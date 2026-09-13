@@ -50,5 +50,8 @@
   },
   "overrides": {
     "sql.js": "1.11.0"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
