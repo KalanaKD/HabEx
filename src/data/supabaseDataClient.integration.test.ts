@@ -10,6 +10,9 @@ import { addDays, todayStr } from '../lib/dates'
 import { signIn, signUp, supabase } from './supabase'
 import { supabaseDataClient as data } from './supabaseDataClient'
 
+// Node global, only used for the opt-in switch; the app tsconfig is browser-only.
+declare const process: { env: Record<string, string | undefined> }
+
 const EMAIL = 'habex-test@example.com'
 const PASSWORD = 'habex-test-password-123'
 
