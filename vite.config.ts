@@ -12,7 +12,7 @@ export default defineConfig({
     include: [
       'react', 'react-dom', 'react-dom/client', 'recharts', 'react-icons/lu', 'canvas-confetti',
       '@capacitor/core', '@capacitor/app', '@capacitor-community/sqlite', 'jeep-sqlite/loader',
-      '@aparajita/capacitor-biometric-auth',
+      '@aparajita/capacitor-biometric-auth', '@supabase/supabase-js',
     ],
   },
 })

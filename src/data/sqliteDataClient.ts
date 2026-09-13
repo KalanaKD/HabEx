@@ -14,6 +14,7 @@ import type { Habit, HabitInput, HabitLog, HabitWithStatus } from '../features/h
 import { addMonths, monthStr, todayStr, type DateStr } from '../lib/dates'
 import { BASE_POINTS, pointsEarned } from '../lib/points'
 import type { BudgetInput, DataClient, DataSnapshot, Goal } from './DataClient'
+import { withStatus } from './habitStatus'
 
 /** Seeded on first launch so the expense form has something to pick from. */
 const DEFAULT_CATEGORIES: { name: string; budget_group: BudgetGroup }[] = [
@@ -63,24 +64,9 @@ export const sqliteDataClient: DataClient = {
     )
   },
 
-  /** Habits joined with today's completion state, current streak and lifetime points. */
   async getHabitsWithStatus(today: DateStr = todayStr()): Promise<HabitWithStatus[]> {
     const [habits, logs] = await Promise.all([sqliteDataClient.getHabits(), sqliteDataClient.getAllHabitLogs()])
-    const byHabit = new Map<string, HabitLog[]>()
-    for (const l of logs) {
-      const arr = byHabit.get(l.habit_id) ?? []
-      arr.push(l)
-      byHabit.set(l.habit_id, arr)
-    }
-    return habits.map((h) => {
-      const hl = byHabit.get(h.id) ?? []
-      return {
-        ...h,
-        completedToday: hl.some((l) => l.completed_on === today),
-        streak: computeStreak(hl.map((l) => l.completed_on), h.schedule, today),
-        totalPoints: hl.reduce((sum, l) => sum + l.points_earned, 0),
-      }
-    })
+    return withStatus(habits, logs, today)
   },
 
   async addHabit(input: HabitInput): Promise<Habit> {
