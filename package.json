@@ -11,7 +11,7 @@
     "sync": "npm run build && npx cap sync android",
     "android": "npm run sync && npx cap open android",
     "apk": "npm run sync && cd android && ./gradlew assembleDebug",
-    "postinstall": "cp node_modules/sql.js/dist/sql-wasm.wasm public/assets/sql-wasm.wasm",
+    "postinstall": "mkdir -p public/assets && cp node_modules/sql.js/dist/sql-wasm.wasm public/assets/sql-wasm.wasm",
     "test": "vitest run",
     "test:watch": "vitest",
     "apk:release": "npm run sync && cd android && ./gradlew assembleRelease"
