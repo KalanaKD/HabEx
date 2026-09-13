@@ -32,6 +32,8 @@ const DEFAULT_CATEGORIES: { name: string; budget_group: BudgetGroup }[] = [
 const GROUP_ORDER: Record<BudgetGroup, number> = { needs: 0, wants: 1, savings: 2 }
 
 let userId: string | null = null
+/** In-flight default-category seeding, shared so concurrent hooks don't each insert. */
+let seeding: Promise<void> | null = null
 const newId = () => crypto.randomUUID()
 
 function fail(error: { message: string } | null): void {
@@ -193,13 +195,21 @@ export const supabaseDataClient: DataClient = {
   },
 
   async ensureDefaultCategories(): Promise<void> {
-    const { count, error } = await supabase().from('categories').select('id', { count: 'exact', head: true })
-    fail(error)
-    if ((count ?? 0) > 0) return
-    const { error: e2 } = await supabase().from('categories').insert(
-      DEFAULT_CATEGORIES.map((c) => ({ id: newId(), ...c, user_id: userId })),
-    )
-    fail(e2)
+    // Several hooks call this on first load. Over the network the count check
+    // and the insert are far enough apart that each caller would seed, so all
+    // callers share one promise and the count is checked inside it.
+    if (!seeding) {
+      seeding = (async () => {
+        const { count, error } = await supabase().from('categories').select('id', { count: 'exact', head: true })
+        fail(error)
+        if ((count ?? 0) > 0) return
+        const { error: e2 } = await supabase().from('categories').insert(
+          DEFAULT_CATEGORIES.map((c) => ({ id: newId(), ...c, user_id: userId })),
+        )
+        fail(e2)
+      })().finally(() => { seeding = null })
+    }
+    return seeding
   },
 
   async addCategory(input: Omit<Category, 'id'>): Promise<Category> {

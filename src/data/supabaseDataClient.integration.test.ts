@@ -142,3 +142,14 @@ describe.skipIf(!process.env.RUN_INTEGRATION)('supabaseDataClient (live)', () =>
     expect(rows).toEqual([])
   })
 })
+
+describe.skipIf(!process.env.RUN_INTEGRATION)('supabaseDataClient concurrency', () => {
+  it('seeds defaults exactly once under concurrent callers', async () => {
+    await data.init()
+    await supabase().from('budgets').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await supabase().from('expenses').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await supabase().from('categories').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await Promise.all([data.ensureDefaultCategories(), data.ensureDefaultCategories(), data.ensureDefaultCategories()])
+    expect(await data.getCategories()).toHaveLength(10)
+  })
+})
