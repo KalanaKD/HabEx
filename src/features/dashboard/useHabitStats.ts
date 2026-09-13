@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import { initDb } from '../../db/db'
+import { getDataClient } from '../../data'
 import { todayStr } from '../../lib/dates'
 import { levelFromPoints, pointsForLevel } from '../../lib/points'
-import { listAllLogs, listHabitsWithStatus, totalPointsEarned } from '../habits/habitsRepo'
 import { buildHeatmap, last7DaysPct, weeklyCompletion, type HeatmapCell, type WeekCompletion } from './habitStats'
 
 export interface HabitStats {
@@ -26,12 +25,13 @@ export function useHabitStats() {
     let cancelled = false
     ;(async () => {
       try {
-        await initDb()
+        const data = getDataClient()
+        await data.init()
         const today = todayStr()
         const [habits, logs, totalPoints] = await Promise.all([
-          listHabitsWithStatus(today),
-          listAllLogs(),
-          totalPointsEarned(),
+          data.getHabitsWithStatus(today),
+          data.getAllHabitLogs(),
+          data.getTotalPoints(),
         ])
         const level = levelFromPoints(totalPoints)
         const floor = pointsForLevel(level)

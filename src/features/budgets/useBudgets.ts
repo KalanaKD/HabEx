@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { initDb } from '../../db/db'
+import { getDataClient } from '../../data'
 import { addMonths, monthStr, todayStr } from '../../lib/dates'
-import { ensureDefaultCategories, listCategories } from '../expenses/categoriesRepo'
 import type { Category } from '../expenses/types'
-import * as repo from './budgetsRepo'
 import { overspendCheck, unassigned, type OverspendResult } from './overspend'
+
+const data = getDataClient()
 
 export interface BudgetRow {
   category: Category
@@ -23,14 +23,14 @@ export function useBudgets() {
 
   const reload = useCallback(async () => {
     try {
-      await initDb()
-      await ensureDefaultCategories()
+      await data.init()
+      await data.ensureDefaultCategories()
       const [cats, limits, inc, history, prev] = await Promise.all([
-        listCategories(),
-        repo.listBudgetsForMonth(month),
-        repo.getIncome(month),
-        repo.spendHistory(month, 3),
-        repo.previousBudgetMonth(month),
+        data.getCategories(),
+        data.getBudgets(month),
+        data.getIncome(month),
+        data.getSpendHistory(month, 3),
+        data.getPreviousBudgetMonth(month),
       ])
       setRows(
         cats.map((category) => {
@@ -72,8 +72,8 @@ export function useBudgets() {
     copyFrom,
     loading,
     error,
-    setIncome: async (amount: number) => { await repo.setIncome(month, amount); await reload() },
-    setLimit: async (categoryId: string, limit: number) => { await repo.setBudget(categoryId, month, limit); await reload() },
-    copyPrevious: async () => { if (copyFrom) { await repo.copyBudgets(copyFrom, month); await reload() } },
+    setIncome: async (amount: number) => { await data.setIncome(month, amount); await reload() },
+    setLimit: async (categoryId: string, limit: number) => { await data.setBudget({ category_id: categoryId, month, limit_amount: limit }); await reload() },
+    copyPrevious: async () => { if (copyFrom) { await data.copyBudgets(copyFrom, month); await reload() } },
   }
 }

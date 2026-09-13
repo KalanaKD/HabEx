@@ -4,7 +4,7 @@ import { isWeekday, parseDateStr, todayStr } from '../../lib/dates'
 import { formatMoney } from '../../lib/money'
 import { levelFromPoints } from '../../lib/points'
 import ExpenseForm from '../expenses/ExpenseForm'
-import { createExpense } from '../expenses/expensesRepo'
+import { getDataClient } from '../../data'
 import HabitRow from '../habits/HabitRow'
 import { useHabits } from '../habits/useHabits'
 import { useTodayMoney } from './useTodayMoney'
@@ -26,7 +26,7 @@ export default function TodayScreen({ onOpenTab, onOpenSettings }: { onOpenTab: 
         <ExpenseForm
           categories={money.data.categories}
           onCancel={() => setAddingExpense(false)}
-          onSubmit={async (input) => { await createExpense(input); await money.reload(); setAddingExpense(false) }}
+          onSubmit={async (input) => { await getDataClient().addExpense(input); await money.reload(); setAddingExpense(false) }}
         />
       </div>
     )

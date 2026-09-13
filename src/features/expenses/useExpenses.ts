@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
-import { initDb } from '../../db/db'
+import { getDataClient } from '../../data'
 import { monthStr, todayStr } from '../../lib/dates'
-import * as cats from './categoriesRepo'
-import * as repo from './expensesRepo'
 import type { BudgetGroup, Category, ExpenseInput, ExpenseWithCategory } from './types'
+
+const data = getDataClient()
 
 export function useExpenses() {
   const [month, setMonth] = useState(() => monthStr(todayStr()))
@@ -14,10 +14,10 @@ export function useExpenses() {
 
   const reload = useCallback(async () => {
     try {
-      await initDb()
-      await cats.ensureDefaultCategories()
-      await repo.materializeRecurring()
-      const [e, c] = await Promise.all([repo.listExpensesForMonth(month), cats.listCategories()])
+      await data.init()
+      await data.ensureDefaultCategories()
+      await data.materializeRecurring()
+      const [e, c] = await Promise.all([data.getExpenses(month), data.getCategories()])
       setExpenses(e)
       setCategories(c)
       setError(null)
@@ -46,11 +46,11 @@ export function useExpenses() {
     loading,
     error,
     total: expenses.reduce((s, e) => s + e.amount, 0),
-    create: wrap((input: ExpenseInput) => repo.createExpense(input)),
-    update: wrap((id: string, input: ExpenseInput) => repo.updateExpense(id, input)),
-    remove: wrap((id: string) => repo.deleteExpense(id)),
-    createCategory: wrap((name: string, g: BudgetGroup) => cats.createCategory(name, g)),
-    updateCategory: wrap((id: string, name: string, g: BudgetGroup) => cats.updateCategory(id, name, g)),
-    removeCategory: wrap((id: string) => cats.deleteCategory(id)),
+    create: wrap((input: ExpenseInput) => data.addExpense(input)),
+    update: wrap((id: string, input: ExpenseInput) => data.updateExpense(id, input)),
+    remove: wrap((id: string) => data.deleteExpense(id)),
+    createCategory: wrap((name: string, g: BudgetGroup) => data.addCategory({ name, budget_group: g })),
+    updateCategory: wrap((id: string, name: string, g: BudgetGroup) => data.updateCategory(id, { name, budget_group: g })),
+    removeCategory: wrap((id: string) => data.deleteCategory(id)),
   }
 }

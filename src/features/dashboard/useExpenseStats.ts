@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react'
-import { initDb } from '../../db/db'
-import { getIncome, listBudgetsForMonth } from '../budgets/budgetsRepo'
-import { listCategories } from '../expenses/categoriesRepo'
-import { monthTotals } from '../expenses/expensesRepo'
+import { getDataClient } from '../../data'
 import type { CategorySpend } from './expenseStats'
 
 export function useExpenseStats(month: string) {
@@ -14,9 +11,10 @@ export function useExpenseStats(month: string) {
     let cancelled = false
     ;(async () => {
       try {
-        await initDb()
+        const data = getDataClient()
+        await data.init()
         const [cats, totals, limits, inc] = await Promise.all([
-          listCategories(), monthTotals(month), listBudgetsForMonth(month), getIncome(month),
+          data.getCategories(), data.getMonthTotals(month), data.getBudgets(month), data.getIncome(month),
         ])
         if (cancelled) return
         setRows(cats.map((category) => ({

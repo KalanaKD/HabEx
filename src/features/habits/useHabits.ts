@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { announceLevelUp, toast } from '../../components/toast'
-import { initDb } from '../../db/db'
+import { getDataClient } from '../../data'
 import { burstAt, shower } from '../../lib/celebrate'
 import { isWeekday, todayStr } from '../../lib/dates'
 import { levelFromPoints } from '../../lib/points'
-import * as repo from './habitsRepo'
 import type { Habit, HabitInput, HabitWithStatus } from './types'
+
+const data = getDataClient()
 
 /**
  * React-side API for the habit feature. Components never call the repo
@@ -18,8 +19,8 @@ export function useHabits() {
 
   const reload = useCallback(async (): Promise<HabitWithStatus[]> => {
     try {
-      await initDb()
-      const list = await repo.listHabitsWithStatus()
+      await data.init()
+      const list = await data.getHabitsWithStatus()
       setHabits(list)
       setError(null)
       return list
@@ -48,10 +49,10 @@ export function useHabits() {
     loading,
     error,
     reload,
-    create: wrap((input: HabitInput) => repo.createHabit(input)),
-    update: wrap((id: string, input: HabitInput) => repo.updateHabit(id, input)),
-    archive: wrap((id: string) => repo.archiveHabit(id)),
-    remove: wrap((id: string) => repo.deleteHabit(id)),
+    create: wrap((input: HabitInput) => data.addHabit(input)),
+    update: wrap((id: string, input: HabitInput) => data.updateHabit(id, input)),
+    archive: wrap((id: string) => data.archiveHabit(id)),
+    remove: wrap((id: string) => data.deleteHabit(id)),
     /**
      * Complete + celebrate. `origin` is the screen point of the tapped
      * button so the confetti bursts from it.
@@ -59,7 +60,7 @@ export function useHabits() {
     complete: async (habit: Habit, origin?: { x: number; y: number }) => {
       const before = habits.reduce((s, h) => s + h.totalPoints, 0)
       const wasDone = habits.find((h) => h.id === habit.id)?.completedToday
-      const log = await repo.completeHabit(habit)
+      const log = await data.logHabitComplete(habit.id)
       const list = await reload()
       if (wasDone) return // no-op tap; nothing to celebrate
 
@@ -79,6 +80,6 @@ export function useHabits() {
         toast('All done for today! 🎉')
       }
     },
-    uncomplete: wrap((habit: Habit) => repo.uncompleteHabit(habit)),
+    uncomplete: wrap((habit: Habit) => data.undoHabitComplete(habit.id)),
   }
 }

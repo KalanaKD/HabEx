@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import { initDb } from '../../db/db'
+import { getDataClient } from '../../data'
 import { monthStr, todayStr } from '../../lib/dates'
-import { getIncome, listBudgetsForMonth, spendHistory } from '../budgets/budgetsRepo'
 import { overspendCheck } from '../budgets/overspend'
-import { ensureDefaultCategories, listCategories } from '../expenses/categoriesRepo'
-import { daySpend, materializeRecurring, monthTotals } from '../expenses/expensesRepo'
 import type { Category } from '../expenses/types'
 
 export interface TodayMoney {
@@ -24,13 +21,14 @@ export function useTodayMoney() {
 
   const reload = useCallback(async () => {
     try {
-      await initDb()
-      await ensureDefaultCategories()
-      await materializeRecurring()
+      const data = getDataClient()
+      await data.init()
+      await data.ensureDefaultCategories()
+      await data.materializeRecurring()
       const today = todayStr()
       const month = monthStr(today)
       const [cats, totals, limits, income, history, todaySpent] = await Promise.all([
-        listCategories(), monthTotals(month), listBudgetsForMonth(month), getIncome(month), spendHistory(month, 3), daySpend(today),
+        data.getCategories(), data.getMonthTotals(month), data.getBudgets(month), data.getIncome(month), data.getSpendHistory(month, 3), data.getDaySpend(today),
       ])
       const overBudget: string[] = []
       const overspend: string[] = []
