@@ -42,3 +42,7 @@ android/*.jks
 
 # Built APKs
 release/
+
+# Local env (Supabase URL/key for the web build)
+.env
+.env.local
