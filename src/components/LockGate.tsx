@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { App as CapApp } from '@capacitor/app'
 import { LuLock } from 'react-icons/lu'
+import { isNative } from '../data'
 import { authenticate, isLockEnabled, RELOCK_AFTER_MS } from '../lib/appLock'
 import { reschedule } from '../lib/reminders'
 
@@ -9,7 +10,7 @@ import { reschedule } from '../lib/reminders'
  * enabled). Locks again after the app has been in the background for a while.
  */
 export default function LockGate({ children }: { children: React.ReactNode }) {
-  const [locked, setLocked] = useState(isLockEnabled)
+  const [locked, setLocked] = useState(() => isNative && isLockEnabled())
   const [message, setMessage] = useState<string | null>(null)
   const busy = useRef(false)
   const hiddenAt = useRef<number | null>(null)
@@ -32,6 +33,7 @@ export default function LockGate({ children }: { children: React.ReactNode }) {
   // Background / foreground tracking. The biometric prompt itself can briefly
   // pause the activity, so `busy` guards against re-locking mid-prompt.
   useEffect(() => {
+    if (!isNative) return // no device lock or reminders on the web build
     void reschedule() // app opened: push the inactivity reminder out 12 h
     const sub = CapApp.addListener('appStateChange', ({ isActive }) => {
       void reschedule() // any foreground/background transition counts as use

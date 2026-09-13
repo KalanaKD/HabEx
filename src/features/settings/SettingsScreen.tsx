@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { LuArrowLeft, LuBell, LuLock, LuMonitor, LuMoon, LuSun } from 'react-icons/lu'
+import { LuArrowLeft, LuBell, LuLock, LuLogOut, LuMonitor, LuMoon, LuSun } from 'react-icons/lu'
+import { isNative } from '../../data'
+import { getSession, signOut } from '../../data/supabase'
 import { authenticate, canLock, isLockEnabled, setLockEnabled, type LockCapability } from '../../lib/appLock'
 import { INACTIVITY_HOURS, isReminderEnabled, setReminderEnabled } from '../../lib/reminders'
 import { getThemePref, setThemePref, type ThemePref } from '../../lib/theme'
@@ -25,7 +27,12 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
     if (res.ok) setReminder(on)
   }
 
-  useEffect(() => { void canLock().then(setCap) }, [])
+  const [email, setEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (isNative) void canLock().then(setCap)
+    else void getSession().then((s) => setEmail(s?.user.email ?? null))
+  }, [])
 
   function choose(t: ThemePref) {
     setThemePref(t)
@@ -74,6 +81,19 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
         </div>
       </section>
 
+      {!isNative && (
+        <section className="rounded-xl bg-surface p-4 shadow">
+          <h2 className="mb-2 text-sm font-semibold text-ink-2">Account</h2>
+          <div className="flex items-center gap-3">
+            <span className="flex-1 truncate text-sm text-ink">{email ?? '…'}</span>
+            <button onClick={() => void signOut()} className="flex items-center gap-1 rounded-lg border border-edge-strong px-3 py-1.5 text-sm text-ink-muted">
+              <LuLogOut /> Sign out
+            </button>
+          </div>
+        </section>
+      )}
+
+      {isNative && (<>
       <section className="rounded-xl bg-surface p-4 shadow">
         <h2 className="mb-2 text-sm font-semibold text-ink-2">Security</h2>
         <label className="flex items-center gap-3">
@@ -103,6 +123,7 @@ export default function SettingsScreen({ onBack }: { onBack: () => void }) {
         </label>
         {reminderMsg && <p className="mt-2 text-xs text-ink-soft">{reminderMsg}</p>}
       </section>
+      </>)}
 
       {/* After a restore every screen's cached state is stale; going back remounts Today. */}
       <DataSection onRestored={() => { setTheme(getThemePref()); onBack() }} />

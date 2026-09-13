@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { LuDownload, LuShare2, LuUpload } from 'react-icons/lu'
 import { toast } from '../../components/toast'
+import { isNative } from '../../data'
 import { describeBackup, exportBackup, lastBackupAt, parseBackup, restoreBackup, shareBackup, type BackupFile, type ExportResult } from '../../lib/backup'
 
 /** Backup / restore controls for the Settings screen. */
@@ -59,16 +60,18 @@ export default function DataSection({ onRestored }: { onRestored: () => void }) 
     <section className="rounded-xl bg-surface p-4 shadow">
       <h2 className="mb-1 text-sm font-semibold text-ink-2">Data</h2>
       <p className="mb-3 text-xs text-ink-soft">
-        Everything lives only on this device. {last ? `Last backup ${new Date(last).toLocaleString()}.` : 'No backup yet.'}
+        {isNative ? 'Everything lives only on this device.' : 'Your data is stored in your account.'} {last ? `Last backup ${new Date(last).toLocaleString()}.` : 'No backup yet.'}
       </p>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className={`grid gap-2 ${isNative ? 'grid-cols-2' : 'grid-cols-1'}`}>
         <button onClick={doExport} disabled={busy} className={`${btn} bg-indigo-600 text-white`}>
           <LuDownload /> Export backup
         </button>
-        <button onClick={() => fileInput.current?.click()} disabled={busy} className={`${btn} border border-edge-strong text-ink-muted`}>
-          <LuUpload /> Restore…
-        </button>
+        {isNative && (
+          <button onClick={() => fileInput.current?.click()} disabled={busy} className={`${btn} border border-edge-strong text-ink-muted`}>
+            <LuUpload /> Restore…
+          </button>
+        )}
         <input ref={fileInput} type="file" accept="application/json,.json" onChange={onPick} className="hidden" />
       </div>
 
